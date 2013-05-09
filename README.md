@@ -7,6 +7,8 @@ Description:
 Sage has minimal functionality for axiomatic set theory computing. In fact, while symbolic logic is supported, there are no universal quantifiers, and the symbolic logic section does not support sets. 
 
 Goals (as difficulty permits):
+
+
 1. create a system that can evaluate universal and existential quantifiers.
 
 2. intoduce set theory into this system, namely "element of". (in axiomatic set theory every thing is a set).
