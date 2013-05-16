@@ -1,0 +1,20 @@
+#Pythagorean Scale, perfect fifths
+Scale = [['Do',1],['Di'],['Re'],['Ri'],['Me'],['Fa'],['Fi'],['Sol'],['Si'],['La'],['Li'],['Ti']]
+index = 0
+new_tone = 1
+for i in range(11):
+    #print 'loop ' + str(i)
+    new_tone = new_tone*3/2
+    index = (index + 7)%12
+    #print 'index = ' + str(index)
+    if new_tone < 1:
+        while new_tone < 1:
+            new_tone = new_tone*2
+    elif new_tone > 2:
+        while new_tone > 2:
+            new_tone = new_tone/2
+    else:
+        pass
+    #print 'new_tone = ' + str(new_tone)
+    Scale[index].append(new_tone)
+print Scale
