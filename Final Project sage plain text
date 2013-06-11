@@ -1,0 +1,125 @@
+sage: MyPerfectInterval = 3/2 #A perfect fifth is 3/2 ratio
+sage: #To get started run cell 5
+sage: ##continued fraction portion
+sage: def f(interval = (3/2)):
+...       """This function takes in an interval that you want perfect and outputs suggested # of tones in the 
+...       scale. It also tells you which step will have your interval in it.
+...       The numerator is the number of tones, the denominator is the the step."""
+...       ratio = continued_fraction(log(2)/log(interval))
+...       return ratio.convergents()
+sage: frac = f(MyPerfectInterval); frac
+[1, 2, 5/3, 12/7, 41/24, 53/31, 306/179, 665/389, 15601/9126, 31867/18641, 79335/46408, 111202/65049, 190537/111457, 10590737/6195184, 10781274/6306641]
+sage: #for the next section you want to format the input for 'interval' variable as [denominator, interval ratio], where denominator is the number of steps for your perfect interval.
+sage: #the 'tones' variable is the numerator.
+sage: Pythagorean = TemperedScale([denominator(frac[3]),MyPerfectInterval],numerator(frac[3]))
+sage: ##Here is the bulk of the code, it has no interact features, this cell must just be run (before cell 4). 
+sage: #audio output stuff
+sage: import wave
+sage: from struct import pack
+sage: class TemperedScale():
+...       """All methods and information about the custom tuning scale are here."""
+...       def __init__(self, interval = [7,3/2], tones = 12):
+...           self.interval = interval
+...           self.tones = tones
+...           
+...       def scale_ratio(self, decimal = 'False'):
+...           """Creates a list that gives the ratio of each note to Unison (Tonic) based on the perfect                    
+...               interval chosen."""
+...           
+...           if gcd(self.interval[0],self.tones) == 1:    
+...               Scale = [[0,1]] #The first note in the scale
+...               
+...               for i in range(self.tones-1):
+...                   Scale.append([i+1])
+...               index = 0
+...               new_tone = 1
+...               for i in range(self.tones-1):
+...                   new_tone = new_tone*self.interval[1]
+...                   index = (index + self.interval[0])%self.tones
+...                   
+...                   #We want a scale that starts at 1 and ends at the octave (2). Since all octaves must be a perfect
+...                          # 2:1 frequency, we adjust it to get it in the appropriate place.
+...                   if new_tone < 1:
+...                       while new_tone < 1:
+...                           new_tone = new_tone*2
+...                   elif new_tone > 2:
+...                       while new_tone > 2:
+...                           new_tone = new_tone/2
+...                   else:
+...                       pass
+...                   if decimal == True:
+...                       Scale[index].append(float(new_tone))
+...                   else:
+...                       Scale[index].append(new_tone)
+...               Scale.append([self.tones,2])   
+...               return Scale
+...           else:
+...               print "ERROR ERROR"
+...               print "gcd of " + str(self.interval[0]) + " " + str(self.tones) + " is " + str(gcd(self.interval[0], tones))
+...               ##I should throw an exception here but I don't really know how to do it properly.
+...               pass
+...        
+...       def differences(self):
+...           """ returns the difference in cents to equal temperament, the number of cents in an octave is 
+...           100*tones, divided equally. Reminder: equal temperament is a scale where each step is 2^(1/tones) ratio"""
+...           differences = []
+...           for i in range(self.tones):
+...               #The formula for cents is defined by the ratio between two frequencies. It's a different label for #Decibels
+...               differences.append(float((100*self.tones)*ln(self.scale_ratio()[i][1])/ln(2)-i*100))
+...           return differences
+...           
+...       def equal_temp(self):
+...           """returns a TemperedScale object with equal difference between tones"""
+...           scale = TemperedScale([1,2^(1/self.tones)], tones = self.tones)
+...           return scale
+...           
+...       def play(self, directory, hertz = 440):
+...           """Creates a .wav file of your scale. .3333 seconds for each tone."""
+...           directory = directory + "Perfect_" + str(float(self.interval[1])) + "_" + str(self.tones) + "_tones.wav"
+...           
+...           mywave = wave.open(directory,'wb') #automatically creates such a file if none exists.
+...           RATE = 44100
+...           mywave.setparams((1, 2, RATE, 0, 'NONE', 'not compressed'))
+...           ratios = self.scale_ratio()
+...           
+...           #I tried pulling the wvData="" and the write outside the j loop, but then the temporary list gets too big.
+...           for j in range(self.tones):
+...               wvData=""    
+...               for i in range(0, RATE/3):
+...                   wvData+=pack('h', 1000*sin(hertz*ratios[j][1]*2*pi*i/RATE))
+...               mywave.writeframes(wvData)
+...           mywave.close()
+...           print "To hear, play the file at " + directory
+...           
+...       def playdif(self, directory, hertz = 440):
+...           """Plays equal temperament and your scale together, notice the beat phenomena. The more notes in your
+...                  scale, the harder it will be to hear. Also the higher the hertz, the easier it will be to hear."""
+...                  
+...           directory = directory + "Differences:_Perfect_" + str(float(self.interval[1])) + "_" + str(self.tones) + "_tones.wav"
+...           mywave = wave.open(directory,'wb')
+...           RATE = 44100
+...           mywave.setparams((1, 2, RATE, 0, 'NONE', 'not compressed'))
+...           
+...           #we don't want to call these methods in the next loop more than once
+...           ratios = self.scale_ratio()
+...           eqratios = self.equal_temp().scale_ratio()
+...           for j in range(self.tones):
+...               wvData=""    
+...               for i in range(0, RATE/3):
+...                   wvData+=pack('h', 500*sin(hertz*ratios[j][1]*2*pi*i/RATE) + 500*sin(hertz*eqratios[j][1]*2*pi*i/RATE))
+...               mywave.writeframes(wvData)
+...       
+...           mywave.close()
+...           print "To hear, play the file at " + directory
+sage: Pythagorean.scale_ratio()
+[[0, 1], [1, 2187/2048], [2, 9/8], [3, 19683/16384], [4, 81/64], [5, 177147/131072], [6, 729/512], [7, 3/2], [8, 6561/4096], [9, 27/16], [10, 59049/32768], [11, 243/128], [12, 2]]
+sage: Pythagorean.differences()
+[0.0, 13.68500605771193, 3.9100017307748374, 17.595007788486782, 7.820003461549675, 21.505009519261534, 11.730005192324484, 1.955000865387433, 15.64000692309935, 5.865002596162412, 19.550008653874215, 9.775004326936823]
+sage: eq = Pythagorean.equal_temp()
+sage: print eq.scale_ratio()
+sage: eq.differences()
+[[0, 1], [1, 2^(1/12)], [2, 2^(1/6)], [3, 2^(1/4)], [4, 2^(1/3)], [5, 2^(5/12)], [6, sqrt(2)], [7, 2^(7/12)], [8, 2^(2/3)], [9, 2^(3/4)], [10, 2^(5/6)], [11, 2^(11/12)], [12, 2]]
+[0.0, 8.526512829121202e-14, 5.684341886080802e-14, -5.684341886080802e-14, 5.684341886080802e-14, 0.0, 1.1368683772161603e-13, 1.1368683772161603e-13, -1.1368683772161603e-13, 0.0, 0.0, 0.0]
+sage: Pythagorean.play('/Users/Kippy/Desktop/')
+sage: Pythagorean.eq('/Users/Kippy/Desktop/')
+sage: Pythagorean.playdif('/Users/Kippy/Desktop/')
