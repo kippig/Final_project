@@ -20,6 +20,8 @@ To solve this problem we used continued fractions. We want our perfect interval 
 Some people's solutions to this problem have been to preserve the perfect 3/2, and base all notes of that preservation. (A perfect fifth is 3/2 ratio with 7 steps for the fifth, out of a total 12 notes in the scale). Since 7 and 12 are coprime, then we can assign a value to all 12 tones. This is explained in detail inside the program.
 The problem this causes though is that the distant between any two notes is different, and other intervals we want consonant (the 5/4 ratio on the major 3rd which is 4 steps on the 12 scale), can get much worse to the point where they are unplayable. Also, if we go up 6 perfect fifths one way, and go down 6 perfect fifths the other way, we come to a note which should be the same, but they're off by a noticable amount, this is called pythagorean comma. More can be explored if you explore "Pythagorean tuning" and "Just intonation".
 
+This guy has a pretty cool paper on it: http://www.whitman.edu/mathematics/SeniorProjectArchive/2009/bartha.pdf
+
 My Program:
 
 My program asks for a ratio of integers than you wish to keep as perfect as possible. It then provides the continued fraction divergents. You pick one of them and put into a tempered scale class, which lets you do all sorts of things with it.
