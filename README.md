@@ -3,6 +3,9 @@ Final_project
 
 Final project 480a, spring 2013
 
+THE SWS VERSION CAN BE FOUND HERE: https://docs.google.com/file/d/0B7fAPeb_rtOtdGpuY0tCR2pqWUU/edit?usp=sharing
+(I screwed up the auto-authenticate on mac.git, so I'm having trouble uploading files).
+
 Description:
 
 Make your own scale. You can listen to the different scales. The less notes you use the easier it is to hear the difference.The sage worksheet (or sagecloud) should be used to run through the program. It's heavily commented.
